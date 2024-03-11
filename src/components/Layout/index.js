@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   LaptopOutlined,
   NotificationOutlined,
@@ -17,13 +17,15 @@ import {
 import Image1 from "./1.jpg";
 import Image2 from "./2.jpg";
 import Image3 from "./3.jpg";
-import ProductDetailCard from "./ProductCard";
+import NewProduct from "../NewProduct";
+import AllProducts from "../AllProducts";
+import OrderTable from "../OrderTable";
+import OrderHistoryTable from "../OrderHistoryTable";
 
 const { Header, Content, Sider } = Layout;
 const { Meta } = Card;
 
 const items1 = [
-  "ร้านขายสุขภัณฑ์",
   "หน้าแรก",
   "ดูสินค้าทั้งหมด",
   "ประวัติการสั่งซื้อ",
@@ -43,6 +45,7 @@ const items2 = [
 ];
 
 const FullLayout = () => {
+  const [keyMenu, setKeyMenu] = useState("1");
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -268,6 +271,7 @@ const FullLayout = () => {
           defaultSelectedKeys={["1"]}
           style={{ lineHeight: "64px" }}
           items={items1}
+          onClick={(e) => { setKeyMenu(e.key); console.log(keyMenu);}}
         />
       </Header>
       <Layout>
@@ -290,83 +294,51 @@ const FullLayout = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            <Carousel autoplay>
-              <div>
-                <img
-                  src={Image1}
-                  alt="Image 1"
-                  style={{ width: "100%", height: "300px" }}
-                />
-              </div>
-              <div>
-                <img
-                  src={Image2}
-                  alt="Image 2"
-                  style={{ width: "100%", height: "300px" }}
-                />
-              </div>
-              <div>
-                <img
-                  src={Image3}
-                  alt="Image 3"
-                  style={{ width: "100%", height: "300px" }}
-                />
-              </div>
-            </Carousel>
 
-            <div>
-              <h2 style={{ textAlign: "center", margin: "20px 0" }}>
-                New Product
-              </h2>
-              <Row gutter={[16, 16]}>
-                {productData.map((product) => (
-                  <Col key={product.id} span={6}>
-                    <Card
-                      hoverable
-                      cover={<img alt={product.name} src={product.image} />}
-                    >
-                      <Meta
-                        title={product.name}
-                        description={product.description}
-                      />
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </div>
+            {/*   =============================  หน้าแรก  ============================= */}
 
-            <div>
-              <h2 style={{ textAlign: "center", margin: "20px 0" }}>
-                Recommendedproducts
-              </h2>
-              <Row gutter={[16, 16]}>
-                {Recommendedproducts.map((product) => (
-                  <Col key={product.id} span={6}>
-                    <Card
-                      hoverable
-                      cover={<img alt={product.name} src={product.image} />}
-                    >
-                      <Meta
-                        title={product.name}
-                        description={product.description}
-                      />
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </div>
-            <hr />
+            {keyMenu === "1" ?
+              <>
+                <Carousel autoplay>
+                  <div>
+                    <img
+                      src={Image1}
+                      alt="Image 1"
+                      style={{ width: "100%", height: "300px" }}
+                    />
+                  </div>
+                  <div>
+                    <img
+                      src={Image2}
+                      alt="Image 2"
+                      style={{ width: "100%", height: "300px" }}
+                    />
+                  </div>
+                  <div>
+                    <img
+                      src={Image3}
+                      alt="Image 3"
+                      style={{ width: "100%", height: "300px" }}
+                    />
+                  </div>
+                </Carousel>
+                <NewProduct productData={productData} Recommendedproducts={Recommendedproducts} />
+              </>
+              : null}
+            {/*   =============================  ดูสินค้าทั้งหมด  ============================= */}
+            
+            {keyMenu === "2" ?
+              <>
+                <AllProducts ProductDetail={ProductDetail} />
+              </>
+              : null}
 
-            <h2 style={{ textAlign: "center", margin: "20px 0" }}>
-              สินค้าทั้งหมด
-            </h2>
-            <Row gutter={[16, 16]}>
-              {ProductDetail.map((product) => (
-                <Col key={product.id} span={6}>
-                  <ProductDetailCard Data={product} />
-                </Col>
-              ))}
-            </Row>
+            {/*   =============================  ประวัติการสั่งซื้อ  ============================= */}
+
+            {keyMenu === "3" ? <OrderHistoryTable /> : null}
+            {/*   =============================  ตะกร้าสินค้า  ============================= */}
+            {keyMenu === "4" ?  <OrderTable /> : null}
+
           </Content>
         </Layout>
       </Layout>
