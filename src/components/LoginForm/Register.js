@@ -1,113 +1,129 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { message } from 'antd';
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f0f0;
+  background-color: #9A616D;
 `;
 
-const FormContainer = styled.div`
-  background-color: #fff;
-  padding: 20px;
+const RegisterForm = styled.form`
+  background-color: #ffffff;
+  padding: 40px;
   border-radius: 8px;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
-`;
-
-const Title = styled.h2`
-  text-align: center;
-  margin-bottom: 20px;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 15px;
-`;
-
-const Label = styled.label`
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 12px 20px;
+  margin: 8px 0;
+  border: 1px solid ${({ error }) => (error ? 'red' : '#dbdbdb')};
+  border-radius: 3px;
+  box-sizing: border-box;
 `;
 
 const Button = styled.button`
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
-  color: #fff;
+  margin-top: 10px;
   border: none;
   border-radius: 4px;
+  background-color: #0095f6;
+  color: #fff;
+  font-weight: bold;
   cursor: pointer;
 `;
 
-function Register() {
-  const [inputs, setInputs] = useState({});
+const Register = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
 
-  const handleChange = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setInputs((values) => ({ ...values, [name]: value }));
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    alert(JSON.stringify(inputs));
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      message.error('Passwords do not match');
+      return;
+    }
+    try {
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password, name, phone, address }),
+      });
+      if (response.ok) {
+        message.success('Registration successful');
+        window.location.assign("/");
+      } else {
+        message.error('Registration failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      message.error('An error occurred during registration. Please try again later.');
+    }
   };
 
   return (
     <Container>
-      <FormContainer>
-        <Title>Register</Title>
-        <form onSubmit={handleSubmit}>
-          <FormGroup>
-            <Label>Email:</Label>
-            <Input
-              type="text"
-              name="Email"
-              value={inputs.Email || ""}
-              onChange={handleChange}
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label>Password:</Label>
-            <Input
-              type="password"
-              name="Password"
-              value={inputs.Password || ""}
-              onChange={handleChange}
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label>Confirm Password:</Label>
-            <Input
-              type="password"
-              name="ConfirmPassword"
-              value={inputs.ConfirmPassword || ""}
-              onChange={handleChange}
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label>Tel:</Label>
-            <Input
-              type="tel"
-              name="Tel"
-              value={inputs.Tel || ""}
-              onChange={handleChange}
-            />
-          </FormGroup>
-          <Button type="submit">Register</Button>
-        </form>
-      </FormContainer>
+      <RegisterForm onSubmit={handleRegister}>
+        <h2>Register</h2>
+        <Input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          error={password !== '' && password !== confirmPassword}
+        />
+        <Input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          error={confirmPassword !== '' && password !== confirmPassword}
+        />
+        <Input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Input
+          type="text"
+          placeholder="Phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <Input
+          type="text"
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+        <Button type="submit">Register</Button>
+      </RegisterForm>
     </Container>
   );
-}
+};
 
 export default Register;

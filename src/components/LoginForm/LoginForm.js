@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Register from './Register';
+import { message } from 'antd';
 
 
 const Container = styled.div`
@@ -8,7 +8,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #9A616D; /* ใส่สีพื้นหลังตามต้องการ */
+  background-color: #9A616D;
 `;
 
 const LoginForm = styled.form`
@@ -43,24 +43,47 @@ const Button = styled.button`
 `;
 
 const RegisterButton = styled(Button)`
-  background-color: #8e44ad; /* เปลี่ยนสีปุ่ม Register ตามต้องการ */
+  background-color: #8e44ad;
+`;
+
+const Notification = styled.div`
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 4px;
+  text-align: center;
 `;
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [notification, setNotification] = useState(''); // Define notification state
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Username:', username);
-    console.log('Password:', password);
-    // เพิ่มโค้ดตรวจสอบผู้ใช้งานที่นี่
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      if (response.ok) {
+        message.success('Login successful');
+        window.location.assign('/LoadingPage');
+      } else {
+        message.error('Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      message.error('An error occurred during login. Please try again later.');
+    }
   };
 
   const handleRegister = () => {
-    
-    
-    console.log('Redirect to Register Page');
+   window.location.assign('/register');
   };
 
   return (
@@ -81,6 +104,7 @@ const LoginPage = () => {
         />
         <Button type="submit">Login</Button>
         <RegisterButton type="button" onClick={handleRegister}>Register</RegisterButton>
+        <Notification>{notification}</Notification>
       </LoginForm>
     </Container>
   );
